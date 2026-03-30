@@ -58,8 +58,8 @@ const AssessmentMarks = () => {
           ))}
         </div>
 
-        {/* Marks Table */}
         <div style={{ marginBottom: '1.5rem', position: 'relative', zIndex: 1 }}>
+          <div className="table-responsive">
           <table style={styles.marksTable}>
             <thead>
               <tr>
@@ -82,7 +82,9 @@ const AssessmentMarks = () => {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
+
 
 
 

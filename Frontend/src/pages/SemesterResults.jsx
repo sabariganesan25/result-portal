@@ -50,7 +50,7 @@ const SemesterResults = () => {
   return (
     <div style={styles.container}>
       {/* Control Actions - Hidden when printing */}
-      <div style={styles.actionRow} className="no-print">
+      <div style={styles.actionRow} className="action-row no-print">
         <h2 style={{ margin: 0, color: 'var(--primary)' }}>Academic Results</h2>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button className="btn btn-primary" style={styles.actionBtn} onClick={handlePrint}>
@@ -60,7 +60,7 @@ const SemesterResults = () => {
       </div>
       
       {/* Official Result Document Wrapper */}
-      <div className="card watermark-bg" style={styles.documentCard}>
+      <div className="card watermark-bg doc-card" style={styles.documentCard}>
         
         {/* University Header */}
         <div style={styles.docHeader}>
@@ -103,8 +103,8 @@ const SemesterResults = () => {
           </table>
         </div>
         
-        {/* Marks Table */}
         <div style={styles.marksSection}>
+          <div className="table-responsive">
           <table style={styles.marksTable}>
             <thead>
               <tr>
@@ -130,6 +130,7 @@ const SemesterResults = () => {
               })}
             </tbody>
           </table>
+          </div>
         </div>
 
 

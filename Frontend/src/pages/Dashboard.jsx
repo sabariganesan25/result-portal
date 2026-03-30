@@ -36,7 +36,7 @@ const Dashboard = () => {
           padding: '3rem 3rem 5rem',
           position: 'relative',
           overflow: 'hidden',
-        }}>
+        }} className="banner-hero">
           {/* Decorative circles */}
           <div style={{ position:'absolute', top:-60, right:-60, width:220, height:220, borderRadius:'50%', background:'rgba(255,255,255,0.05)' }} />
           <div style={{ position:'absolute', bottom:-80, left:-30, width:260, height:260, borderRadius:'50%', background:'rgba(255,255,255,0.04)' }} />
@@ -79,11 +79,11 @@ const Dashboard = () => {
           padding: '1.75rem 2rem',
           position: 'relative',
           zIndex: 2,
-        }}>
+        }} className="pullup-card">
           <p style={{ margin:'0 0 1.25rem', fontSize:'0.72rem', color:'#94a3b8', textTransform:'uppercase', letterSpacing:'2px', fontWeight:600 }}>
             Student Information
           </p>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.25rem' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.25rem' }} className="pullup-grid">
             {fields.map(({ icon, label, value }) => (
               <div key={label} style={{
                 display:'flex', alignItems:'flex-start', gap:'1rem',
@@ -117,7 +117,7 @@ const Dashboard = () => {
           borderRadius:'10px',
           display:'flex', alignItems:'center', justifyContent:'center',
           gap:'0.75rem',
-        }}>
+        }} className="footer-strip">
           <FaUniversity color="rgba(255,255,255,0.7)" size={14} />
           <span style={{ color:'rgba(255,255,255,0.75)', fontSize:'0.8rem', letterSpacing:'0.5px' }}>
             AURCC · Office of the Controller of Examinations · Student Academic Portal

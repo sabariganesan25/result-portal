@@ -22,14 +22,12 @@ const Login = () => {
   };
 
   return (
-    <div style={styles.pageWrap}>
-      {/* Background Hero Section mimicking a campus photo */}
+    <div style={styles.pageWrap} className="login-wrapper">
       <div style={styles.heroBg}></div>
-      
-      <div style={styles.loginContainer}>
+      <div style={styles.loginContainer} className="login-container">
         
         {/* Left Informational Panel */}
-        <div style={styles.infoPanel}>
+        <div style={styles.infoPanel} className="login-info-panel">
           <FaBuilding size={48} color="white" style={{ marginBottom: '1rem' }} />
           <h2 style={{ color: 'white', marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>
             Office of the Controller of Examinations
@@ -51,7 +49,7 @@ const Login = () => {
         </div>
 
         {/* Right Authentication Panel */}
-        <div style={styles.authPanel}>
+        <div style={styles.authPanel} className="login-auth-panel">
           <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
             <FaUserLock size={36} color="var(--primary)" />
             <h2 style={{ color: 'var(--primary)', marginTop: '0.5rem' }}>Secure Login</h2>
