@@ -31,7 +31,7 @@ const AssessmentMarks = () => {
 
         {/* University Header */}
         <div style={styles.docHeader}>
-          <div style={styles.logoPlaceholder}>AURCC</div>
+          <div style={styles.logoPlaceholder} className="doc-logo">AURCC</div>
           <div style={{ textAlign: 'center' }}>
             <h1 style={styles.univName}>ANNA UNIVERSITY REGIONAL CAMPUS COIMBATORE</h1>
             <p style={styles.univDesc}>(An Autonomous Institution affiliated to Anna University, Chennai)</p>

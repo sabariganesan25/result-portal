@@ -209,4 +209,24 @@ tr:hover { background-color: #f1f5f9; }
   .doc-logo   { display: none !important; }
   .univ-name  { font-size: 1rem !important; }
   .doc-title  { font-size: 0.88rem !important; }
+
+  /* Candidate Details Table Stacking */
+  .details-table, .details-table tbody, .details-tr, .details-label, .details-val {
+    display: block !important;
+    width: 100% !important;
+  }
+  .details-tr {
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border) !important;
+  }
+  .details-label {
+    background: #f1f5f9;
+    padding: 0.5rem 0.75rem !important;
+    border: none !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+  .details-val {
+    padding: 0.5rem 0.75rem !important;
+    border: none !important;
+  }
 }

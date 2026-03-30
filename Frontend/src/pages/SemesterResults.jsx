@@ -64,8 +64,8 @@ const SemesterResults = () => {
         
         {/* University Header */}
         <div style={styles.docHeader}>
-          <div style={styles.logoPlaceholder}>AURCC</div>
-          <div style={styles.docHeaderText}>
+          <div style={styles.logoPlaceholder} className="doc-logo">AURCC</div>
+          <div style={styles.docHeaderText} className="doc-header-text">
             <h1 style={styles.univName}>ANNA UNIVERSITY REGIONAL CAMPUS COIMBATORE</h1>
             <p style={styles.univDesc}>(An Autonomous Institution affiliated to Anna University, Chennai)</p>
             <h3 style={styles.docTitle}>PROVISIONAL SEMESTER GRADE SHEET</h3>
@@ -75,29 +75,29 @@ const SemesterResults = () => {
 
         {/* Candidate Details Table */}
         <div style={styles.candidateSection}>
-          <table style={styles.detailsTable}>
+          <table style={styles.detailsTable} className="details-table">
             <tbody>
-              <tr>
-                <td style={styles.detailsLabel}>Register Number</td>
-                <td style={styles.detailsValue}>{user.regNo}</td>
-                <td style={styles.detailsLabel}>Semester</td>
-                <td style={styles.detailsValue}>{activeSem}</td>
+              <tr className="details-tr">
+                <td style={styles.detailsLabel} className="details-label">Register Number</td>
+                <td style={styles.detailsValue} className="details-val">{user.regNo}</td>
+                <td style={styles.detailsLabel} className="details-label">Semester</td>
+                <td style={styles.detailsValue} className="details-val">{activeSem}</td>
               </tr>
-              <tr>
-                <td style={styles.detailsLabel}>Candidate Name</td>
-                <td style={styles.detailsValue}>{user.name}</td>
-                <td style={styles.detailsLabel}>Programme</td>
-                <td style={styles.detailsValue}>B.Tech</td>
+              <tr className="details-tr">
+                <td style={styles.detailsLabel} className="details-label">Candidate Name</td>
+                <td style={styles.detailsValue} className="details-val">{user.name}</td>
+                <td style={styles.detailsLabel} className="details-label">Programme</td>
+                <td style={styles.detailsValue} className="details-val">B.Tech</td>
               </tr>
-              <tr>
-                <td style={styles.detailsLabel}>Branch/Department</td>
-                <td colSpan="3" style={styles.detailsValue}>{user.branch || user.dept}</td>
+              <tr className="details-tr">
+                <td style={styles.detailsLabel} className="details-label">Branch/Department</td>
+                <td colSpan="3" style={styles.detailsValue} className="details-val">{user.branch || user.dept}</td>
               </tr>
-              <tr>
-                <td style={styles.detailsLabel}>Institution Code</td>
-                <td style={styles.detailsValue}>7115</td>
-                <td style={styles.detailsLabel}>Result Date</td>
-                <td style={styles.detailsValue}>Mar 24, 2026</td>
+              <tr className="details-tr">
+                <td style={styles.detailsLabel} className="details-label">Institution Code</td>
+                <td style={styles.detailsValue} className="details-val">7115</td>
+                <td style={styles.detailsLabel} className="details-label">Result Date</td>
+                <td style={styles.detailsValue} className="details-val">Mar 24, 2026</td>
               </tr>
             </tbody>
           </table>
