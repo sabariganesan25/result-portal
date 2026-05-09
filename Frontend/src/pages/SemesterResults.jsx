@@ -1,45 +1,76 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { semesterResults } from '../data/mockData';
-import { FaPrint, FaDownload, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import api from '../services/api';
+import { FaPrint, FaDownload, FaCheckCircle, FaExclamationTriangle, FaSpinner } from 'react-icons/fa';
 
 const SemesterResults = () => {
   const { user } = useAuth();
+  const [resultsData, setResultsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   
-  if (!user) {
+  const activeSem = 6;
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (!user) return;
+      try {
+        setLoading(true);
+        const response = await api.get(`/results/${user.registration_no}`);
+        if (response.data.success) {
+          setResultsData(response.data);
+        }
+      } catch (err) {
+        setError('Failed to load academic results.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResults();
+  }, [user]);
+  
+  if (!user || loading) {
     return (
       <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
-        Loading student record...
+        {loading ? <FaSpinner className="spinner" /> : null}
+        <p>{loading ? 'Fetching student record...' : 'Redirecting...'}</p>
       </div>
     );
   }
 
-  // Using Mock Data instead of backend
-  const activeSem = 6;
-  const data = semesterResults.find(s => s.semester === activeSem) || semesterResults[0];
-  const subjects = data.subjects || [];
-  const totalCredits = subjects.reduce((sum, sub) => sum + sub.credits, 0) || 22;
+  if (error) {
+    return (
+      <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--danger)' }}>
+        <FaExclamationTriangle size={48} style={{ marginBottom: '1rem' }} />
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  const subjects = resultsData?.results || [];
+  const totalCredits = subjects.reduce((sum, sub) => sum + (sub.credits || 0), 0) || 0;
 
   // Compute SGPA strictly for realism
   let earnedPoints = 0;
   subjects.forEach(sub => {
     let points = 0;
-    if (sub.grade === 'O') points = 10;
-    else if (sub.grade === 'S' || sub.grade === 'A+') points = 10; // adapting dummy grades
-    else if (sub.grade === 'A') points = 9;
-    else if (sub.grade === 'B+' || sub.grade === 'B') points = 8;
-    else if (sub.grade === 'C+' || sub.grade === 'C') points = 7;
-    else if (sub.grade === 'D') points = 6;
-    else if (sub.grade === 'E') points = 5;
-    else if (sub.grade === 'P') points = 4;
+    const grade = (sub.grade || '').toUpperCase();
+    if (grade === 'O' || grade === 'S' || grade === 'A+') points = 10;
+    else if (grade === 'A') points = 9;
+    else if (grade === 'B+' || grade === 'B') points = 8;
+    else if (grade === 'C+' || grade === 'C') points = 7;
+    else if (grade === 'D') points = 6;
+    else if (grade === 'E') points = 5;
+    else if (grade === 'P') points = 4;
     else points = 0; // U / F
     
-    earnedPoints += points * sub.credits;
+    earnedPoints += points * (sub.credits || 0);
   });
   
-  const sgpa = (earnedPoints / totalCredits).toFixed(2);
-  // Ensure we use the backend CGPA representation if available
-  const displaySgpa = isNaN(sgpa) ? (user.cgpa || 0.00).toFixed(2) : sgpa;
+  const sgpa = totalCredits > 0 ? (earnedPoints / totalCredits).toFixed(2) : "0.00";
+  const displaySgpa = sgpa;
 
   const handlePrint = () => {
     window.print();
@@ -79,7 +110,7 @@ const SemesterResults = () => {
             <tbody>
               <tr className="details-tr">
                 <td style={styles.detailsLabel} className="details-label">Register Number</td>
-                <td style={styles.detailsValue} className="details-val">{user.regNo}</td>
+                <td style={styles.detailsValue} className="details-val">{user.registration_no}</td>
                 <td style={styles.detailsLabel} className="details-label">Semester</td>
                 <td style={styles.detailsValue} className="details-val">{activeSem}</td>
               </tr>
@@ -91,7 +122,7 @@ const SemesterResults = () => {
               </tr>
               <tr className="details-tr">
                 <td style={styles.detailsLabel} className="details-label">Branch/Department</td>
-                <td colSpan="3" style={styles.detailsValue} className="details-val">{user.branch || user.dept}</td>
+                <td colSpan="3" style={styles.detailsValue} className="details-val">{user.department}</td>
               </tr>
               <tr className="details-tr">
                 <td style={styles.detailsLabel} className="details-label">Institution Code</td>
@@ -119,8 +150,8 @@ const SemesterResults = () => {
                 const failed = isFailed(sub.grade);
                 return (
                   <tr key={idx}>
-                    <td style={{ textAlign: 'center', fontWeight: 600 }}>{sub.code}</td>
-                    <td>{sub.name}</td>
+                    <td style={{ textAlign: 'center', fontWeight: 600 }}>{sub.subject_code}</td>
+                    <td>{sub.subject_name}</td>
                     <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{sub.grade}</td>
                     <td style={{ textAlign: 'center', fontWeight: 'bold', color: failed ? 'var(--danger)' : 'var(--success)' }}>
                       {failed ? 'FAIL' : 'PASS'}

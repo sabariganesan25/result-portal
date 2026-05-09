@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useAdminAuth } from '../context/AdminAuthContext';
 import { useNavigate } from 'react-router-dom';
-import { FaUserLock, FaShieldAlt, FaIdCard, FaBuilding } from 'react-icons/fa';
+import { FaUserLock, FaShieldAlt, FaIdCard, FaBuilding, FaUserTie } from 'react-icons/fa';
 
 const Login = () => {
-  const [regNo, setRegNo] = useState('');
+  const [loginMode, setLoginMode] = useState('student'); // 'student' or 'admin'
+  const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
-  const { login, error, loading } = useAuth();
+  
+  const { login: studentLogin, error: studentError, loading: studentLoading } = useAuth();
+  const { loginAdmin, error: adminError, loading: adminLoading } = useAdminAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -15,11 +19,18 @@ const Login = () => {
       alert('Please enter your password');
       return;
     }
-    const success = await login(regNo, password);
-    if (success) {
-      navigate('/');
+    
+    if (loginMode === 'student') {
+      const success = await studentLogin(userId, password);
+      if (success) navigate('/');
+    } else {
+      const success = await loginAdmin(userId, password);
+      if (success) navigate('/admin');
     }
   };
+
+  const loading = loginMode === 'student' ? studentLoading : adminLoading;
+  const error = loginMode === 'student' ? studentError : adminError;
 
   return (
     <div style={styles.pageWrap} className="login-wrapper">
@@ -42,7 +53,8 @@ const Login = () => {
             </h4>
             <ul style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.8rem', paddingLeft: '1rem' }}>
               <li style={{ marginBottom: '0.5rem' }}>Nov/Dec 2025 Tier-1 Results are now published.</li>
-              <li style={{ marginBottom: '0.5rem' }}>For demo, use Registration No: <strong>101</strong> and Password: <strong>123</strong></li>
+              <li style={{ marginBottom: '0.5rem' }}>Student Demo: ID <strong>101</strong> | Pass <strong>123</strong></li>
+              <li style={{ marginBottom: '0.5rem' }}>Admin Demo: ID <strong>admin</strong> | Pass <strong>admin123</strong></li>
               <li>Re-valuation portals will open from 30th March 2026.</li>
             </ul>
           </div>
@@ -50,10 +62,25 @@ const Login = () => {
 
         {/* Right Authentication Panel */}
         <div style={styles.authPanel} className="login-auth-panel">
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
             <FaUserLock size={36} color="var(--primary)" />
             <h2 style={{ color: 'var(--primary)', marginTop: '0.5rem' }}>Secure Login</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Enter your credentials to access your dashboard</p>
+          </div>
+
+          <div style={styles.toggleContainer}>
+            <div 
+              style={{...styles.toggleBtn, ...(loginMode === 'student' ? styles.toggleActive : {})}}
+              onClick={() => { setLoginMode('student'); setUserId(''); setPassword(''); }}
+            >
+              <FaIdCard /> Student
+            </div>
+            <div 
+              style={{...styles.toggleBtn, ...(loginMode === 'admin' ? styles.toggleActiveAdmin : {})}}
+              onClick={() => { setLoginMode('admin'); setUserId(''); setPassword(''); }}
+            >
+              <FaUserTie /> Administrator
+            </div>
           </div>
 
           <form onSubmit={handleLogin} style={styles.form}>
@@ -61,13 +88,13 @@ const Login = () => {
             
             <div style={styles.inputGroup}>
               <label style={styles.label}>
-                <FaIdCard /> Registration Number
+                {loginMode === 'student' ? <><FaIdCard /> Registration Number</> : <><FaUserTie /> Admin ID / Username</>}
               </label>
               <input
                 type="text"
-                value={regNo}
-                onChange={(e) => setRegNo(e.target.value)}
-                placeholder="Enter 101 for demo"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                placeholder={loginMode === 'student' ? "Enter 101 for demo" : "Enter admin for demo"}
                 style={styles.input}
                 required
               />
@@ -81,7 +108,7 @@ const Login = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password (demo: 123)"
+                placeholder={loginMode === 'student' ? "Enter password (demo: 123)" : "Enter admin123"}
                 style={styles.input}
                 required
               />
@@ -91,16 +118,21 @@ const Login = () => {
               <label style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 <input type="checkbox" /> Remember me
               </label>
-              <a href="#" style={{ fontSize: '0.8rem', color: 'var(--primary)' }}>Forgot Reg No?</a>
+              <a href="#" style={{ fontSize: '0.8rem', color: 'var(--primary)' }}>
+                {loginMode === 'student' ? 'Forgot Reg No?' : 'Forgot Password?'}
+              </a>
             </div>
 
             <button
               type="submit"
               disabled={loading}
               className="btn btn-primary"
-              style={styles.submitBtn}
+              style={{
+                ...styles.submitBtn,
+                backgroundColor: loginMode === 'admin' ? 'var(--secondary)' : 'var(--primary)'
+              }}
             >
-              {loading ? 'Authenticating...' : 'Sign In to Portal'}
+              {loading ? 'Authenticating...' : `Sign In as ${loginMode === 'student' ? 'Student' : 'Admin'}`}
             </button>
           </form>
 
@@ -216,7 +248,39 @@ const styles = {
     fontSize: '0.85rem',
     textAlign: 'center',
     border: '1px solid #fca5a5'
-  }
+  },
+  toggleContainer: {
+    display: 'flex',
+    backgroundColor: '#f1f5f9',
+    borderRadius: '8px',
+    padding: '0.25rem',
+    marginBottom: '2rem'
+  },
+  toggleBtn: {
+    flex: '1',
+    padding: '0.75rem',
+    textAlign: 'center',
+    cursor: 'pointer',
+    borderRadius: '6px',
+    fontSize: '0.9rem',
+    fontWeight: '600',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.5rem',
+    transition: 'all 0.3s ease',
+    color: '#64748b'
+  },
+  toggleActive: {
+    backgroundColor: '#ffffff',
+    color: 'var(--primary)',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+  },
+  toggleActiveAdmin: {
+    backgroundColor: '#ffffff',
+    color: 'var(--secondary)',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+  },
 };
 
 export default Login;

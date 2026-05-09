@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aurcc-backend
+  namespace: default
+  labels:
+    app: aurcc-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aurcc-backend
+  template:
+    metadata:
+      labels:
+        app: aurcc-backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "5000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: aurcc-backend
+        image: 295284356306.dkr.ecr.ap-south-1.amazonaws.com/aurcc-backend:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: PORT
+          value: "5000"
+        - name: AWS_REGION
+          value: "ap-south-1"
+        - name: DYNAMODB_TABLE
+          value: "students-results"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: aurcc-secrets
+              key: jwt-secret
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aurcc-secrets
+              key: aws-access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aurcc-secrets
+              key: aws-secret-access-key
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aurcc-backend
+  namespace: default
+spec:
+  selector:
+    app: aurcc-backend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5000
+  type: LoadBalancer

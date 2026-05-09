@@ -1,17 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { semesterResults } from '../data/mockData';
-import { FaPrint, FaExclamationTriangle } from 'react-icons/fa';
+import api from '../services/api';
+import { FaPrint, FaExclamationTriangle, FaSpinner } from 'react-icons/fa';
 
 const AssessmentMarks = () => {
   const { user } = useAuth();
   const [activeSem, setActiveSem] = useState(6);
+  const [resultsData, setResultsData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!user) return <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>Loading...</div>;
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (!user) return;
+      try {
+        setLoading(true);
+        const response = await api.get(`/results/${user.registration_no}`);
+        if (response.data.success) {
+          setResultsData(response.data);
+        }
+      } catch (err) {
+        console.error('Failed to load assessment marks:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const data = semesterResults.find(s => s.semester === activeSem) || semesterResults[0];
-  const subjects = data.subjects || [];
-  const totalCredits = subjects.reduce((sum, s) => sum + s.credits, 0);
+    fetchResults();
+  }, [user]);
+
+  if (!user || loading) {
+    return (
+      <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+        {loading ? <FaSpinner className="spinner" /> : null}
+        <p>{loading ? 'Loading marks...' : 'Access Denied'}</p>
+      </div>
+    );
+  }
+
+  const allResults = resultsData?.results || [];
+  const subjects = allResults.filter(s => s.semester === activeSem);
+  
+  // If no subjects for selected sem, show first available sem or empty
+  const displaySubjects = subjects.length > 0 ? subjects : (allResults.length > 0 ? allResults.filter(s => s.semester === allResults[0].semester) : []);
+  
+  const semList = [...new Set(allResults.map(s => s.semester))].sort((a, b) => a - b);
 
   const isFailed = (grade) => ['U', 'F', 'RA', 'AB'].includes(grade.toUpperCase());
 
@@ -44,16 +76,16 @@ const AssessmentMarks = () => {
 
         {/* Semester Tabs — no-print */}
         <div className="no-print" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
-          {semesterResults.map(s => (
-            <button key={s.semester} onClick={() => setActiveSem(s.semester)} style={{
+          {semList.map(sem => (
+            <button key={sem} onClick={() => setActiveSem(sem)} style={{
               padding: '0.35rem 1rem', borderRadius: '4px', border: '1px solid',
               cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600,
-              background: activeSem === s.semester ? '#002147' : '#f1f5f9',
-              color: activeSem === s.semester ? 'white' : '#64748b',
-              borderColor: activeSem === s.semester ? '#002147' : '#e2e8f0',
+              background: activeSem === sem ? '#002147' : '#f1f5f9',
+              color: activeSem === sem ? 'white' : '#64748b',
+              borderColor: activeSem === sem ? '#002147' : '#e2e8f0',
               transition: 'all 0.2s',
             }}>
-              Sem {s.semester}
+              Sem {sem}
             </button>
           ))}
         </div>
@@ -71,13 +103,13 @@ const AssessmentMarks = () => {
               </tr>
             </thead>
             <tbody>
-              {subjects.map((sub, idx) => (
+              {displaySubjects.map((sub, idx) => (
                 <tr key={idx}>
-                  <td style={{ textAlign: 'center', fontWeight: 600 }}>{sub.code}</td>
-                  <td>{sub.name}</td>
-                  <td style={{ textAlign: 'center' }}>{sub.internal}</td>
-                  <td style={{ textAlign: 'center' }}>{sub.external}</td>
-                  <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{sub.total}</td>
+                  <td style={{ textAlign: 'center', fontWeight: 600 }}>{sub.subject_code}</td>
+                  <td>{sub.subject_name}</td>
+                  <td style={{ textAlign: 'center' }}>{sub.internal_marks}</td>
+                  <td style={{ textAlign: 'center' }}>{sub.external_marks}</td>
+                  <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{sub.internal_marks + sub.external_marks}</td>
                 </tr>
               ))}
             </tbody>

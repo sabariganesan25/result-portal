@@ -7,3 +7,7 @@ dist/
 
 # Local Netlify folder
 .netlify
+
+# Binaries
+eksctl.exe
+eksctl.zip
