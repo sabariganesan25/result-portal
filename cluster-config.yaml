@@ -6,7 +6,7 @@ metadata:
   region: ap-south-1
 
 managedNodeGroups:
-  - name: standard-nodes-v2
+  - name: standard-nodes-v4
     instanceType: t3.small
     minSize: 1
     maxSize: 3

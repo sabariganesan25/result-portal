@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "result-day": "powershell -ExecutionPolicy Bypass -File ./simulate-result-day.ps1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1045.0",
+    "@aws-sdk/lib-dynamodb": "^3.1045.0",
+    "dotenv": "^17.4.2"
+  }
+}

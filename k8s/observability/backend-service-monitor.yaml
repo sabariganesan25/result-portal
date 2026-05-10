@@ -1,0 +1,22 @@
+# k8s/observability/backend-service-monitor.yaml
+# Tells the Prometheus Operator to scrape metrics from the AURCC backend
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: aurcc-backend-monitor
+  namespace: monitoring              # Monitor namespace
+  labels:
+    release: kube-prometheus-stack   # Match the Prometheus release label
+spec:
+  selector:
+    matchLabels:
+      app: aurcc-backend             # Match labels on the backend Service
+  namespaceSelector:
+    matchNames:
+    - default                        # Namespace where backend is running
+  endpoints:
+  - port: http                       # Port name in Service (if named) or use port number
+    path: /metrics
+    interval: 15s
+    scrapeTimeout: 10s

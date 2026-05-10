@@ -6,7 +6,7 @@ metadata:
   labels:
     app: aurcc-backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: aurcc-backend
@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: aurcc-backend
-        image: 295284356306.dkr.ecr.ap-south-1.amazonaws.com/aurcc-backend:latest
+        image: 295284356306.dkr.ecr.ap-south-1.amazonaws.com/aurcc-backend:v3
         ports:
         - containerPort: 5000
         env:
@@ -51,8 +51,8 @@ spec:
             cpu: 100m
             memory: 128Mi
           limits:
-            cpu: 500m
-            memory: 512Mi
+            cpu: 200m
+            memory: 256Mi
         readinessProbe:
           httpGet:
             path: /api/health

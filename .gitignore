@@ -14,3 +14,5 @@ dist/
 # Binaries
 eksctl.exe
 eksctl.zip
+k6.zip
+k6-bin/

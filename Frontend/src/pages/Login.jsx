@@ -13,6 +13,8 @@ const Login = () => {
   const { loginAdmin, error: adminError, loading: adminLoading } = useAdminAuth();
   const navigate = useNavigate();
 
+  const [statusMessage, setStatusMessage] = useState('');
+
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!password) {
@@ -20,6 +22,15 @@ const Login = () => {
       return;
     }
     
+    setStatusMessage('Connecting to secure server...');
+    const slowTimer = setTimeout(() => {
+      if (loading) setStatusMessage('High traffic detected, please wait...');
+    }, 3000);
+
+    const verySlowTimer = setTimeout(() => {
+      if (loading) setStatusMessage('Server busy, still retrying connection...');
+    }, 8000);
+
     if (loginMode === 'student') {
       const success = await studentLogin(userId, password);
       if (success) navigate('/');
@@ -27,6 +38,10 @@ const Login = () => {
       const success = await loginAdmin(userId, password);
       if (success) navigate('/admin');
     }
+
+    clearTimeout(slowTimer);
+    clearTimeout(verySlowTimer);
+    setStatusMessage('');
   };
 
   const loading = loginMode === 'student' ? studentLoading : adminLoading;
@@ -53,9 +68,8 @@ const Login = () => {
             </h4>
             <ul style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.8rem', paddingLeft: '1rem' }}>
               <li style={{ marginBottom: '0.5rem' }}>Nov/Dec 2025 Tier-1 Results are now published.</li>
-              <li style={{ marginBottom: '0.5rem' }}>Student Demo: ID <strong>101</strong> | Pass <strong>123</strong></li>
-              <li style={{ marginBottom: '0.5rem' }}>Admin Demo: ID <strong>admin</strong> | Pass <strong>admin123</strong></li>
-              <li>Re-valuation portals will open from 30th March 2026.</li>
+              <li style={{ marginBottom: '0.5rem' }}>Student IDs have been updated for result-day simulation.</li>
+              <li style={{ marginBottom: '0.5rem' }}>Re-valuation portals will open from 30th March 2026.</li>
             </ul>
           </div>
         </div>
@@ -85,6 +99,12 @@ const Login = () => {
 
           <form onSubmit={handleLogin} style={styles.form}>
             {error && <div style={styles.errorBox}>{error}</div>}
+            {loading && statusMessage && (
+              <div style={styles.statusBox}>
+                <div className="spinner-small"></div>
+                {statusMessage}
+              </div>
+            )}
             
             <div style={styles.inputGroup}>
               <label style={styles.label}>
@@ -94,7 +114,7 @@ const Login = () => {
                 type="text"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                placeholder={loginMode === 'student' ? "Enter 101 for demo" : "Enter admin for demo"}
+                placeholder={loginMode === 'student' ? "e.g. 711521104001" : "Enter admin ID"}
                 style={styles.input}
                 required
               />
@@ -108,7 +128,7 @@ const Login = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={loginMode === 'student' ? "Enter password (demo: 123)" : "Enter admin123"}
+                placeholder="Enter your password"
                 style={styles.input}
                 required
               />
@@ -142,7 +162,20 @@ const Login = () => {
   );
 };
 
+
 const styles = {
+  statusBox: {
+    backgroundColor: '#eff6ff',
+    color: '#1d4ed8',
+    padding: '0.8rem',
+    borderRadius: '4px',
+    marginBottom: '1rem',
+    fontSize: '0.85rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.7rem',
+    border: '1px solid #bfdbfe'
+  },
   pageWrap: {
     minHeight: '80vh',
     display: 'flex',
